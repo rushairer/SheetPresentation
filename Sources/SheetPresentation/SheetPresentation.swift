@@ -100,7 +100,7 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                             .opacity(0.4)
                     }
                     Spacer().frame(height: 0.3).opacity(0)
-                    view()
+                    view().frame(maxHeight: .infinity)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(background)
@@ -132,6 +132,7 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                             }
                         }
                         .onEnded { state in
+                            let lastAccumulated = accumulated
                             accumulated = offset
                             
                             if hasTwoDetens {
@@ -156,9 +157,9 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                                         isPresented = false
                                     }
                                 } else {
-                                    accumulated.y =  screenHeight * 0.4 - (isFullScreen ? 0 : proxy.safeAreaInsets.top)
                                     withAnimation {
-                                        offset = accumulated
+                                        accumulated = lastAccumulated
+                                        offset = lastAccumulated
                                     }
                                 }
                             }
