@@ -2,6 +2,9 @@
 
 SheetPresentation for SwiftUI.
 
+## Screenshots
+
+<img src="https://raw.githubusercontent.com/rushairer/SheetPresentation/screenshots/screenshot_phone.gif" width="300"/><img src="https://raw.githubusercontent.com/rushairer/SheetPresentation/screenshots/screenshot_watch.gif" width="300"/>
 
 ## Overview
 
