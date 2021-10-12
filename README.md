@@ -1,6 +1,8 @@
 # SheetPresentation
 
-SheetPresentation for SwiftUI.
+SheetPresentation for SwiftUI. 
+
+`NOT UISheetPresentationController wapped version.`
 
 ## Screenshots
 
