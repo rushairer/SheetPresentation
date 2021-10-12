@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "RoundedCorners",
+        "repositoryURL": "https://github.com/rushairer/RoundedCorners",
+        "state": {
+          "branch": null,
+          "revision": "5a8d554040be91beb9952066ad3be9fef4be60a3",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
