@@ -121,7 +121,7 @@ struct SheetPresentationDemo_Previews: PreviewProvider {
 ```
 ## Demo App
 
-![DEMO](https://github.com/rushairer/SheetPresentation/tree/demo)
+[DEMO](https://github.com/rushairer/SheetPresentation/tree/demo)
 
 ## LICENSE
 
