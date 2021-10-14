@@ -37,6 +37,7 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
     
     @GestureState private var translation = CGPoint.zero
     @State private var offset = CGPoint.zero
+    
     @State private var accumulated = CGPoint.zero
     
     private var screenSize: CGSize {
@@ -45,7 +46,7 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
 #elseif os(watchOS)
         return WKInterfaceDevice.current().screenBounds.size
 #else
-        return NSScreen.main?.frame.size ?? .zero
+        return NSScreen.main?.visibleFrame.size ?? .zero
 #endif
     }
     
@@ -75,8 +76,11 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
 #if !os(tvOS)
         let hasTwoDetens: Bool = detents.count == 2
 #endif
-
+        
         GeometryReader { proxy in
+#if os(macOS)
+            let screenHeight = proxy.frame(in: .global).height
+#endif
             ZStack {
                 content
                 if hasMaskView {
@@ -107,17 +111,38 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                 .cornerRadius(tl: 20, tr: 20, bl: 0, br: 0)
                 .offset(y: isPresented ? offset.y : screenHeight)
                 .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 6)
+#if !os(macOS) && !targetEnvironment(macCatalyst)
                 .edgesIgnoringSafeArea(isFullScreen ? .all : .bottom)
+                .animation(nil, value: isFullScreen)
+#endif
                 .onChange(of: isPresented, perform: { isPresented in
                     if isPresented {
+#if os(macOS) || targetEnvironment(macCatalyst)
+                        accumulated.y = isMediumDetent ? screenHeight * 0.4: 0
+#else
                         accumulated.y = isMediumDetent ? screenHeight * 0.4 - (isFullScreen ? 0 : proxy.safeAreaInsets.top): 0
+#endif
                         offset = accumulated
+                    } else {
+#if os(macOS)
+                        offset.y = screenHeight
+                        accumulated = CGPoint.zero
+#endif
                     }
                 })
-                
+#if os(macOS)
+                .onAppear {
+                    offset.y = screenHeight
+                    accumulated = CGPoint.zero
+                }
+#endif
                 .onChange(of: isFullScreen, perform: { isFullScreen in
                     if isPresented {
+#if os(macOS) || targetEnvironment(macCatalyst)
+                        accumulated.y = isMediumDetent ? screenHeight * 0.4: 0
+#else
                         accumulated.y = isMediumDetent ? screenHeight * 0.4 - (isFullScreen ? 0 : proxy.safeAreaInsets.top): 0
+#endif
                         offset = accumulated
                     }
                 })
@@ -126,7 +151,11 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                 .highPriorityGesture(
                     DragGesture(minimumDistance: 20, coordinateSpace: .global)
                         .onChanged { value in
+#if os(macOS)
+                            let newOffset = CGPoint(x: 0, y: -value.translation.height + accumulated.y)
+#else
                             let newOffset = CGPoint(x: 0, y: value.translation.height + accumulated.y)
+#endif
                             if newOffset.y >= 0 {
                                 offset = newOffset
                             }
@@ -152,7 +181,12 @@ public struct SheetPresentationViewModifier<SheetContent, Background>: ViewModif
                                     }
                                 }
                             } else {
-                                if state.translation.height > screenHeight * 0.2 {
+#if os(macOS)
+                                let offsetHeight = -state.translation.height
+#else
+                                let offsetHeight = state.translation.height
+#endif
+                                if offsetHeight > screenHeight * 0.2 {
                                     withAnimation {
                                         isPresented = false
                                     }
@@ -177,13 +211,19 @@ struct SheetPresentationDemo_Previews: PreviewProvider {
     struct SheetPresentationDemo: View {
         @State private var showsSheetPresentation: Bool = false
         
-        @State private var hasGrabber: Bool = false
+        @State private var hasGrabber: Bool = true
         @State private var hasMaskView: Bool = false
         @State private var isFullScreen: Bool = false
         
-        @State private var detents: [SheetPresentationDetent] = DetentsType.m.detents
+        @State private var detents: [SheetPresentationDetent] = DetentsType.ml.detents
         
-        @State private var detentsType: DetentsType = .m
+        @State private var detentsType: DetentsType = .ml
+
+        enum Field: Hashable {
+            case show
+            case close
+        }
+        
         enum DetentsType: String {
             case m
             case l
@@ -204,21 +244,21 @@ struct SheetPresentationDemo_Previews: PreviewProvider {
             }
         }
         
-#if os(iOS)
+    #if os(iOS)
         private var background = Color(UIColor.systemBackground)
-#elseif os(macOS)
+    #elseif os(macOS)
         private var background = Color(NSColor.windowBackgroundColor)
-#else
+    #else
         private var background = Color.black
-#endif
+    #endif
         
         var body:  some View {
             List {
-#if os(watchOS)
+    #if os(watchOS)
                 let pickerStyle = WheelPickerStyle()
-#else
+    #else
                 let pickerStyle = SegmentedPickerStyle()
-#endif
+    #endif
                 
                 Section(footer: Text("M: medium, L: Large")) {
                     Toggle("Grabber", isOn: $hasGrabber)
@@ -250,26 +290,28 @@ struct SheetPresentationDemo_Previews: PreviewProvider {
                                isFullScreen: isFullScreen,
                                detents: detents) {
                 VStack {
-                    background.frame(height: 48)
-                    List {
-                        Button {
-                            showsSheetPresentation = false
-                        } label: {
-                            Text("Close")
-                        }
-                        
-                        ForEach(0..<100) { index in
-                            Text("\(index)")
-                        }
+                    Button {
+                        showsSheetPresentation = false
+                    } label: {
+                        Text("Close")
+    #if os(macOS)
+                            .animation(nil)
+    #endif
+                    }
+                    .padding()
+                    
+                    List(0..<100) { index in
+                        Text("\(index)")
                     }
                 }
+                
             }
         }
     }
-    
+
     static var previews: some View {
         SheetPresentationDemo()
-#if !os(tvOS)
+#if !os(tvOS) && !os(watchOS)
         SheetPresentationDemo()
             .preferredColorScheme(.dark)
 #endif
