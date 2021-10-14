@@ -1,13 +1,15 @@
 # SheetPresentation
 
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rushairer/SheetPresentation) ![GitHub](https://img.shields.io/github/license/rushairer/SheetPresentation) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/rushairer/SheetPresentation?include_prereleases) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/rushairer/SheetPresentation.svg)
+
 SheetPresentation for SwiftUI. 
+Multiple devices support: iOS, watchOS, tvOS, macOS, macCatalyst.
 
 `NOT UISheetPresentationController wapped version.`
 
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rushairer/SheetPresentation) ![GitHub](https://img.shields.io/github/license/rushairer/SheetPresentation) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/rushairer/SheetPresentation?include_prereleases) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/rushairer/SheetPresentation.svg)
-
 ## Screenshots
 
+<img src="https://github.com/rushairer/SheetPresentation/blob/demo/screenshot.gif" width="600"/>
 <img src="https://raw.githubusercontent.com/rushairer/SheetPresentation/screenshots/screenshot_phone.gif" width="300"/><img src="https://raw.githubusercontent.com/rushairer/SheetPresentation/screenshots/screenshot_watch.gif" width="300"/>
 
 ## Overview
@@ -117,6 +119,9 @@ struct SheetPresentationDemo_Previews: PreviewProvider {
     }
 }
 ```
+## Demo App
+
+![DEMO](https://github.com/rushairer/SheetPresentation/tree/demo)
 
 ## LICENSE
 
